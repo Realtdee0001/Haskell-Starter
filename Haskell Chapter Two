@@ -1,0 +1,90 @@
+module Main where
+
+-- HC2T2 - Task 2: Function Type Signatures and Implementations
+add :: Int -> Int -> Int
+add x y = x + y
+
+isEven :: Int -> Bool
+isEven n = n `mod` 2 == 0
+
+concatStrings :: String -> String -> String
+concatStrings s1 s2 = s1 ++ s2
+
+-- HC2T3 - Task 3: Immutable Variables
+myAge :: Int
+myAge = 25
+
+piValue :: Double
+piValue = 3.14159
+
+greeting :: String
+greeting = "Hello, Haskell!"
+
+isHaskellFun :: Bool
+isHaskellFun = True
+
+-- HC2T5 - Task 5: Defining and Using Functions
+circleArea :: Float -> Float
+circleArea r = pi * r * r
+
+maxOfThree :: Int -> Int -> Int -> Int
+maxOfThree x y z = max x (max y z)
+
+-- HC2T6 - Task 6: Understanding Int vs Integer
+smallNumber :: Int
+smallNumber = 262
+
+bigNumber :: Integer
+bigNumber = 2127
+
+-- HC2T7 - Task 7: Boolean Expressions
+boolExpr1 = True && True          -- should be True
+boolExpr2 = False || False        -- should be False
+boolExpr3 = not False             -- should be True
+boolExpr4 = 5 > 10                -- should be False
+
+-- Main Function to Run All Examples
+main :: IO ()
+main = do
+    putStrLn "=== HC2T1 - Types ==="
+    putStrLn $ "42 :: " ++ show (42 :: Int)
+    putStrLn $ "3.14 :: " ++ show (3.14 :: Double)
+    putStrLn $ "\"Haskell\" :: " ++ show ("Haskell" :: String)
+    putStrLn $ "'Z' :: " ++ show ('Z' :: Char)
+    putStrLn $ "True && False :: " ++ show (True && False)
+
+    putStrLn "\n=== HC2T2 - Functions ==="
+    print $ add 10 5
+    print $ isEven 4
+    print $ concatStrings "Hello, " "World!"
+
+    putStrLn "\n=== HC2T3 - Immutable Variables ==="
+    print myAge
+    print piValue
+    print greeting
+    print isHaskellFun
+
+    putStrLn "\n=== HC2T4 - Prefix/Infix ==="
+    print $ (+) 5 3
+    print $ (*) 10 4
+    print $ (&&) True False
+    print $ 7 + 2
+    print $ 6 * 5
+    print $ True && False
+
+    putStrLn "\n=== HC2T5 - More Functions ==="
+    print $ circleArea 5.0
+    print $ maxOfThree 3 7 5
+
+    putStrLn "\n=== HC2T6 - Int vs Integer ==="
+    print smallNumber
+    print bigNumber
+    -- This line is commented to avoid runtime overflow
+    -- print (2^64 :: Int)
+    print (2^64 :: Integer)
+
+    putStrLn "\n=== HC2T7 - Boolean Expressions ==="
+    print boolExpr1
+    print boolExpr2
+    print boolExpr3
+    print boolExpr4
