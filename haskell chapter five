@@ -1,0 +1,109 @@
+-- HC2T1 - Task 1: Checking Types in GHCi
+-- Expected types:
+-- 42              :: Int
+-- 3.14            :: Fractional a => a (default Double)
+-- "Haskell"       :: String
+-- 'Z'             :: Char
+-- True && False   :: Bool
+
+-- HC2T2 - Task 2: Function Type Signatures and Implementations
+add :: Int -> Int -> Int
+add x y = x + y
+
+isEven :: Int -> Bool
+isEven n = n `mod` 2 == 0
+
+concatStrings :: String -> String -> String
+concatStrings s1 s2 = s1 ++ s2
+
+-- HC2T3 - Task 3: Immutable Variables
+myAge :: Int
+myAge = 25
+
+piValue :: Double
+piValue = 3.14159
+
+greeting :: String
+greeting = "Hello, Haskell!"
+
+isHaskellFun :: Bool
+isHaskellFun = True
+
+-- Uncommenting the below line would cause an error due to immutability:
+-- myAge = 30  -- Error: redefinition
+
+-- HC2T4 - Task 4: Converting Between Infix and Prefix Notations
+
+-- Infix to prefix
+prefix1 = (+) 5 3
+prefix2 = (*) 10 4
+prefix3 = (&&) True False
+
+-- Prefix to infix
+infix1 = 7 + 2
+infix2 = 6 * 5
+infix3 = True && False
+
+-- HC2T5 - Task 5: Defining and Using Functions
+
+circleArea :: Float -> Float
+circleArea r = pi * r * r
+
+maxOfThree :: Int -> Int -> Int -> Int
+maxOfThree a b c = max a (max b c)
+
+-- HC2T6 - Task 6: Understanding Int vs Integer
+
+smallNumber :: Int
+smallNumber = 262
+
+bigNumber :: Integer
+bigNumber = 2127
+
+-- Try evaluating this in GHCi:
+-- 2^64 :: Int
+-- Result: likely overflow (depends on architecture)
+
+-- HC2T7 - Task 7: Boolean Expressions
+
+bool1 = True && True       -- True
+bool2 = False || False     -- False
+bool3 = not False          -- True
+bool4 = 5 > 10             -- False
+
+-- Main function to test everything
+main :: IO ()
+main = do
+  putStrLn "--- HC2T2 Outputs ---"
+  putStrLn ("add 3 5 = " ++ show (add 3 5))
+  putStrLn ("isEven 4 = " ++ show (isEven 4))
+  putStrLn ("concatStrings \"Hello, \" \"World\" = " ++ concatStrings "Hello, " "World")
+
+  putStrLn "\n--- HC2T3 Outputs ---"
+  putStrLn ("myAge = " ++ show myAge)
+  putStrLn ("piValue = " ++ show piValue)
+  putStrLn ("greeting = " ++ greeting)
+  putStrLn ("isHaskellFun = " ++ show isHaskellFun)
+
+  putStrLn "\n--- HC2T4 Outputs ---"
+  putStrLn ("Prefix: (+) 5 3 = " ++ show prefix1)
+  putStrLn ("Prefix: (*) 10 4 = " ++ show prefix2)
+  putStrLn ("Prefix: (&&) True False = " ++ show prefix3)
+  putStrLn ("Infix: 7 + 2 = " ++ show infix1)
+  putStrLn ("Infix: 6 * 5 = " ++ show infix2)
+  putStrLn ("Infix: True && False = " ++ show infix3)
+
+  putStrLn "\n--- HC2T5 Outputs ---"
+  putStrLn ("circleArea 3 = " ++ show (circleArea 3))
+  putStrLn ("maxOfThree 10 20 15 = " ++ show (maxOfThree 10 20 15))
+
+  putStrLn "\n--- HC2T6 Outputs ---"
+  putStrLn ("smallNumber (Int) = " ++ show smallNumber)
+  putStrLn ("bigNumber (Integer) = " ++ show bigNumber)
+  putStrLn "Evaluate 2^64 :: Int in GHCi to observe overflow"
+
+  putStrLn "\n--- HC2T7 Outputs ---"
+  putStrLn ("True && True = " ++ show bool1)
+  putStrLn ("False || False = " ++ show bool2)
+  putStrLn ("not False = " ++ show bool3)
+  putStrLn ("5 > 10 = " ++ show bool4)
