@@ -1,0 +1,68 @@
+-- HC4T1 - Task 1: Define a weatherReport Function
+weatherReport :: String -> String
+weatherReport "sunny"  = "It's a bright and beautiful day!"
+weatherReport "rainy"  = "Don't forget your umbrella!"
+weatherReport "cloudy" = "A bit gloomy, but no rain yet!"
+weatherReport _        = "Weather unknown"
+
+-- HC4T2 - Task 2: Define a dayType Function
+dayType :: String -> String
+dayType "Saturday" = "It's a weekend!"
+dayType "Sunday"   = "It's a weekend!"
+dayType "Monday"   = "It's a weekday."
+dayType "Tuesday"  = "It's a weekday."
+dayType "Wednesday"= "It's a weekday."
+dayType "Thursday" = "It's a weekday."
+dayType "Friday"   = "It's a weekday."
+dayType _          = "Invalid day"
+
+-- HC4T3 - Task 3: Define a gradeComment Function
+gradeComment :: Int -> String
+gradeComment grade
+  | grade >= 90 && grade <= 100 = "Excellent!"
+  | grade >= 70 && grade <= 89  = "Good job!"
+  | grade >= 50 && grade <= 69  = "You passed."
+  | grade >= 0  && grade <= 49  = "Better luck next time."
+  | otherwise                   = "Invalid grade"
+
+-- HC4T4 - Task 4: Rewrite specialBirthday using Pattern Matching
+specialBirthday :: Int -> String
+specialBirthday 1  = "First birthday – how cute!"
+specialBirthday 18 = "Adult now!"
+specialBirthday 21 = "Legal everywhere!"
+specialBirthday _  = "Happy Birthday!"
+
+-- HC4T5 - Task 5: Add a Catch-All Pattern with a Custom Message
+specialBirthdayVerbose :: Int -> String
+specialBirthdayVerbose 1  = "First birthday – how cute!"
+specialBirthdayVerbose 18 = "Adult now!"
+specialBirthdayVerbose 21 = "Legal everywhere!"
+specialBirthdayVerbose age = "Happy Birthday at age " ++ show age ++ "!"
+
+-- HC4T6 - Task 6: Identify List Contents Using Pattern Matching
+whatsInsideThisList :: [a] -> String
+whatsInsideThisList []       = "The list is empty."
+whatsInsideThisList [_]      = "The list has one item."
+whatsInsideThisList [_, _]   = "The list has two items."
+whatsInsideThisList _        = "The list has many items."
+
+-- HC4T7 - Task 7: Ignore Elements in a List
+firstAndThird :: [a] -> [a]
+firstAndThird (x:_:z:_) = [x, z]
+firstAndThird _         = []
+
+-- HC4T8 - Task 8: Extract Values from Tuples
+describeTuple :: (String, Int) -> String
+describeTuple (name, age) = name ++ " is " ++ show age ++ " years old."
+
+-- Entry Point
+main :: IO ()
+main = do
+  putStrLn $ "Weather report: " ++ weatherReport "sunny"
+  putStrLn $ "Day type: " ++ dayType "Monday"
+  putStrLn $ "Grade comment: " ++ gradeComment 85
+  putStrLn $ "Special birthday: " ++ specialBirthday 18
+  putStrLn $ "Verbose birthday: " ++ specialBirthdayVerbose 25
+  putStrLn $ "List check: " ++ whatsInsideThisList [1,2,3]
+  print $ firstAndThird [True, False, True, False]
+  putStrLn $ describeTuple ("Alice", 30)
