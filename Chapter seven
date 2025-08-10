@@ -1,0 +1,113 @@
+-- HC7T1 & HC7T2: Eq and Ord for Color
+data Color = Red | Green | Blue
+    deriving (Show, Read, Enum, Bounded)
+
+instance Eq Color where
+    Red   == Red   = True
+    Green == Green = True
+    Blue  == Blue  = True
+    _     == _     = False
+
+instance Ord Color where
+    compare Red   Red   = EQ
+    compare Red   _     = LT
+    compare Green Red   = GT
+    compare Green Green = EQ
+    compare Green Blue  = LT
+    compare Blue  Blue  = EQ
+    compare Blue  _     = GT
+
+-- HC7T3: Function Using Multiple Constraints
+compareValues :: (Eq a, Ord a) => a -> a -> a
+compareValues x y = if x >= y then x else y
+
+-- HC7T4: Custom Type with Show and Read
+data Shape = Circle Double | Rectangle Double Double
+
+instance Show Shape where
+    show (Circle r) = "Circle with radius " ++ show r
+    show (Rectangle w h) = "Rectangle with width " ++ show w ++ " and height " ++ show h
+
+instance Read Shape where
+    readsPrec _ input =
+        case words input of
+            ["Circle", "with", "radius", rStr] ->
+                [(Circle (read rStr), "")]
+            ["Rectangle", "with", "width", wStr, "and", "height", hStr] ->
+                [(Rectangle (read wStr) (read hStr), "")]
+            _ -> []
+
+-- HC7T5: Function with Num Constraint
+squareArea :: Num a => a -> a
+squareArea side = side * side
+
+-- HC7T6: Using Integral and Floating
+circleCircumference :: (Floating a, Integral b) => b -> a
+circleCircumference radius = 2 * pi * fromIntegral radius
+
+-- HC7T7: Bounded and Enum
+nextColor :: Color -> Color
+nextColor c
+    | c == maxBound = minBound
+    | otherwise     = succ c
+
+-- HC7T8: Parse a Value from a String Using Read
+parseShape :: String -> Maybe Shape
+parseShape str =
+    case reads str of
+        [(shape, "")] -> Just shape
+        _             -> Nothing
+
+-- HC7T9: Type Class with Multiple Instances
+class Describable a where
+    describe :: a -> String
+
+instance Describable Bool where
+    describe True  = "This is True"
+    describe False = "This is False"
+
+instance Describable Shape where
+    describe (Circle r) = "A circle of radius " ++ show r
+    describe (Rectangle w h) = "A rectangle of width " ++ show w ++ " and height " ++ show h
+
+-- HC7T10: Function with Multiple Type Class Constraints
+describeAndCompare :: (Describable a, Ord a) => a -> a -> String
+describeAndCompare x y =
+    if x >= y then describe x else describe y
+
+-- Main to demonstrate all tasks
+main :: IO ()
+main = do
+    putStrLn "--- HC7T1 & HC7T2 ---"
+    print (Red == Red)
+    print (Red < Green)
+
+    putStrLn "\n--- HC7T3 ---"
+    print (compareValues 5 7 :: Int)
+
+    putStrLn "\n--- HC7T4 ---"
+    let s1 = Circle 3.5
+    let s2 = Rectangle 4 5
+    print s1
+    print s2
+
+    putStrLn "\n--- HC7T5 ---"
+    print (squareArea 4 :: Int)
+
+    putStrLn "\n--- HC7T6 ---"
+    print (circleCircumference 7 :: Double)
+
+    putStrLn "\n--- HC7T7 ---"
+    print (nextColor Red)
+    print (nextColor Blue)
+
+    putStrLn "\n--- HC7T8 ---"
+    print (parseShape "Circle with radius 5.0")
+    print (parseShape "Invalid shape")
+
+    putStrLn "\n--- HC7T9 ---"
+    putStrLn (describe True)
+    putStrLn (describe s1)
+
+    putStrLn "\n--- HC7T10 ---"
+    print (describeAndCompare True False)
