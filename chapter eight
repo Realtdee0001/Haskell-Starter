@@ -1,0 +1,143 @@
+-- Main.hs
+module Main where
+
+-- HC8T1: Type Synonyms and Basic Function
+type Address = String
+type Value = Int
+
+generateTx :: Address -> Address -> Value -> String
+generateTx fromAddr toAddr val =
+    "Tx from " ++ fromAddr ++ " to " ++ toAddr ++ " of value " ++ show val
+
+-- HC8T2: New Types and Data Constructors
+data PaymentMethod = Cash | Card | Cryptocurrency deriving Show
+
+data PersonInfo = PersonInfo
+  { personName :: String
+  , personAddress :: (String, Int)
+  , paymentMethod :: PaymentMethod
+  } deriving Show
+
+bob :: PersonInfo
+bob = PersonInfo "Bob" ("Main Street", 101) Cash
+
+-- HC8T3: Algebraic Data Types and Functions
+data Shape = Circle Float | Rectangle Float Float deriving Show
+
+area :: Shape -> Float
+area (Circle r) = pi * r * r
+area (Rectangle w h) = w * h
+
+-- HC8T4: Record Syntax for Employee
+data Employee = Employee
+  { name :: String
+  , experienceInYears :: Float
+  } deriving Show
+
+richard :: Employee
+richard = Employee "Richard" 7.5
+
+-- HC8T5: Record Syntax for Person
+data Person = Person
+  { pname :: String
+  , age :: Int
+  , isEmployed :: Bool
+  } deriving Show
+
+person1 :: Person
+person1 = Person "Alice" 30 True
+
+person2 :: Person
+person2 = Person "John" 25 False
+
+-- HC8T6: Record Syntax for Shape Variants
+data ShapeVariant
+  = CircleShape { center :: (Float, Float), color :: String, radius :: Float }
+  | RectangleShape { width :: Float, height :: Float, color :: String }
+  deriving Show
+
+circleInstance :: ShapeVariant
+circleInstance = CircleShape (0,0) "Red" 5
+
+rectangleInstance :: ShapeVariant
+rectangleInstance = RectangleShape 10 5 "Blue"
+
+-- HC8T7: Data Types and Describing Animals
+data Animal = Dog String | Cat String deriving Show
+
+describeAnimal :: Animal -> String
+describeAnimal (Dog n) = "This is a dog named " ++ n
+describeAnimal (Cat n) = "This is a cat named " ++ n
+
+dogInstance :: Animal
+dogInstance = Dog "Buddy"
+
+catInstance :: Animal
+catInstance = Cat "Whiskers"
+
+-- HC8T8: Type Synonyms and Greeting Function
+type Name = String
+type Age = Int
+
+greet :: Name -> Age -> String
+greet n a = "Hello, my name is " ++ n ++ " and I am " ++ show a ++ " years old."
+
+-- HC8T9: Record Type and Transaction Function
+data Transaction = Transaction
+  { from :: Address
+  , to :: Address
+  , amount :: Value
+  , transactionId :: String
+  } deriving Show
+
+createTransaction :: Address -> Address -> Value -> String
+createTransaction f t v =
+    let tx = Transaction f t v "TX123456"
+    in transactionId tx
+
+-- HC8T10: Deriving Show for Book
+data Book = Book
+  { title :: String
+  , author :: String
+  , year :: Int
+  } deriving Show
+
+bookInstance :: Book
+bookInstance = Book "Learn You a Haskell" "Miran Lipovača" 2011
+
+-- Main function to demonstrate everything
+main :: IO ()
+main = do
+    putStrLn "--- HC8T1 ---"
+    putStrLn $ generateTx "Alice" "Bob" 100
+
+    putStrLn "\n--- HC8T2 ---"
+    print bob
+
+    putStrLn "\n--- HC8T3 ---"
+    putStrLn $ "Circle area (r=5): " ++ show (area (Circle 5))
+    putStrLn $ "Rectangle area (10x5): " ++ show (area (Rectangle 10 5))
+
+    putStrLn "\n--- HC8T4 ---"
+    print richard
+
+    putStrLn "\n--- HC8T5 ---"
+    print person1
+    print person2
+
+    putStrLn "\n--- HC8T6 ---"
+    print circleInstance
+    print rectangleInstance
+
+    putStrLn "\n--- HC8T7 ---"
+    putStrLn $ describeAnimal dogInstance
+    putStrLn $ describeAnimal catInstance
+
+    putStrLn "\n--- HC8T8 ---"
+    putStrLn $ greet "Charlie" 40
+
+    putStrLn "\n--- HC8T9 ---"
+    putStrLn $ "Transaction ID: " ++ createTransaction "Addr1" "Addr2" 500
+
+    putStrLn "\n--- HC8T10 ---"
+    print bookInstance
