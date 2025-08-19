@@ -1,0 +1,132 @@
+module Main where
+
+data PaymentMethod = Cash | Card | Cryptocurrency deriving Show
+
+-- HC10T1: ShowSimple Type Class
+class ShowSimple a where
+  showSimple :: a -> String
+
+instance ShowSimple PaymentMethod where
+  showSimple Cash           = "Cash"
+  showSimple Card           = "Card"
+  showSimple Cryptocurrency = "Cryptocurrency"
+
+-- HC10T2: Summable Type Class
+class Summable a where
+  sumUp :: [a] -> a
+
+instance Summable Int where
+  sumUp = sum
+
+-- HC10T3: Comparable Type Class
+data Blockchain = Bitcoin | Ethereum | Cardano deriving Show
+
+class Comparable a where
+  compareWith :: a -> a -> Ordering
+
+instance Comparable Blockchain where
+  compareWith Bitcoin Bitcoin     = EQ
+  compareWith Ethereum Ethereum   = EQ
+  compareWith Cardano Cardano     = EQ
+  compareWith Bitcoin _           = LT
+  compareWith Ethereum Bitcoin    = GT
+  compareWith Ethereum Cardano    = LT
+  compareWith Cardano _           = GT
+
+-- HC10T4: Eq Instance for Box
+data Box a = Empty | Has a deriving Show
+
+instance Eq a => Eq (Box a) where
+  Empty   == Empty   = True
+  Has x   == Has y   = x == y
+  _       == _       = False
+
+-- HC10T5: ShowDetailed Type Class
+data User = User { username :: String, age :: Int }
+
+class ShowDetailed a where
+  showDetailed :: a -> String
+
+instance ShowDetailed User where
+  showDetailed (User u a) = "User: " ++ u ++ ", Age: " ++ show a
+
+-- HC10T6: Eq with mutual recursion (safe)
+instance Eq Blockchain where
+  x == y = case (x, y) of
+    (Bitcoin, Bitcoin)   -> True
+    (Ethereum, Ethereum) -> True
+    (Cardano, Cardano)   -> True
+    _                    -> False
+
+  x /= y = not (x == y)
+
+-- HC10T7: Convertible Type Class
+class Convertible a b where
+  convert :: a -> b
+
+instance Convertible PaymentMethod String where
+  convert Cash           = "Payment: Cash"
+  convert Card           = "Payment: Card"
+  convert Cryptocurrency = "Payment: Cryptocurrency"
+
+-- HC10T8: AdvancedEq Subclass of Eq
+class Eq a => AdvancedEq a where
+  compareEquality :: a -> a -> Bool
+
+instance AdvancedEq Int where
+  compareEquality x y = x == y
+
+-- HC10T9: MinMax Type Class
+class MinMax a where
+  minValue :: a
+  maxValue :: a
+
+instance MinMax Int where
+  minValue = minBound
+  maxValue = maxBound
+
+-- HC10T10: Concatenatable Type Class
+class Concatenatable a where
+  concatWith :: a -> a -> a
+
+instance Concatenatable String where
+  concatWith = (++)
+
+main :: IO ()
+main = do
+  putStrLn "--- HC10T1 ---"
+  print (showSimple Cash)
+  print (showSimple Cryptocurrency)
+
+  putStrLn "\n--- HC10T2 ---"
+  print (sumUp [1,2,3,4 :: Int])
+
+  putStrLn "\n--- HC10T3 ---"
+  print (compareWith Bitcoin Ethereum)
+  print (compareWith Cardano Bitcoin)
+
+  putStrLn "\n--- HC10T4 ---"
+  print (Has 10 == Has 10)
+  print (Empty == (Empty :: Box Int))
+
+  putStrLn "\n--- HC10T5 ---"
+  let u1 = User "Alice" 30
+  putStrLn (showDetailed u1)
+
+  putStrLn "\n--- HC10T6 ---"
+  print (Bitcoin == Bitcoin)
+  print (Ethereum /= Bitcoin)
+
+  putStrLn "\n--- HC10T7 ---"
+  print (convert Card :: String)
+
+  putStrLn "\n--- HC10T8 ---"
+  print (compareEquality (5 :: Int) 5)
+  print (compareEquality (5 :: Int) 6)
+
+  putStrLn "\n--- HC10T9 ---"
+  print (minValue :: Int)
+  print (maxValue :: Int)
+
+  putStrLn "\n--- HC10T10 ---"
+  print (concatWith "Hello, " "world!")
