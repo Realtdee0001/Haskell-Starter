@@ -1,0 +1,87 @@
+-- Main.hs
+module Main where
+
+-- HC9T1: Parametric Type Synonym
+type Entity a = (String, a)  -- (Address, value of type a)
+
+-- HC9T2: Parametric Data Type Box
+data Box a = Empty | Has a deriving Show
+
+-- HC9T3: Function to Add Values in a Box
+addN :: Num a => a -> Box a -> Box a
+addN n Empty    = Empty
+addN n (Has x)  = Has (n + x)
+
+-- HC9T4: Extract a Value from a Box
+extract :: a -> Box a -> a
+extract def Empty   = def
+extract _   (Has x) = x
+
+-- HC9T5: Parametric Data Type Shape with Record Syntax
+data Shape a
+  = Circle { color :: a, radius :: Float }
+  | Rectangle { color :: a, width :: Float, height :: Float }
+  deriving Show
+
+-- HC9T6: Recursive Data Type for Tweets
+data Tweet = Tweet
+  { content  :: String
+  , likes    :: Int
+  , comments :: [Tweet]
+  } deriving Show
+
+-- HC9T7: Engagement Function for Tweets
+engagement :: Tweet -> Int
+engagement (Tweet _ l cs) = l + sum (map engagement cs)
+
+-- HC9T8: Recursive Sequence Data Type
+data Sequence a = Nil | Node a (Sequence a) deriving Show
+
+-- HC9T9: Check for Element in a Sequence
+elemSeq :: Eq a => a -> Sequence a -> Bool
+elemSeq _ Nil = False
+elemSeq y (Node x xs)
+  | y == x    = True
+  | otherwise = elemSeq y xs
+
+-- HC9T10: Binary Search Tree Data Type
+data BST a = EmptyBST | NodeBST a (BST a) (BST a) deriving Show
+
+-- Main function to test everything
+main :: IO ()
+main = do
+    putStrLn "--- HC9T1 ---"
+    let entity1 :: Entity Int
+        entity1 = ("Address1", 100)
+    print entity1
+
+    putStrLn "\n--- HC9T2, HC9T3, HC9T4 ---"
+    let box1 = Has 10
+    let box2 = Empty :: Box Int
+    print (addN 5 box1)     -- should be Has 15
+    print (addN 5 box2)     -- should remain Empty
+    print (extract 0 box1)  -- should be 10
+    print (extract 0 box2)  -- should be 0 (default)
+
+    putStrLn "\n--- HC9T5 ---"
+    let circle1 = Circle "Red" 5.0
+    let rect1   = Rectangle "Blue" 4.0 3.0
+    print circle1
+    print rect1
+
+    putStrLn "\n--- HC9T6, HC9T7 ---"
+    let tweet1 = Tweet "Hello" 10 []
+    let tweet2 = Tweet "Reply" 5 []
+    let tweet3 = Tweet "Main Post" 20 [tweet1, tweet2]
+    print tweet3
+    putStrLn $ "Engagement: " ++ show (engagement tweet3)
+
+    putStrLn "\n--- HC9T8, HC9T9 ---"
+    let seq1 = Node 1 (Node 2 (Node 3 Nil))
+    print seq1
+    putStrLn $ "Contains 2? " ++ show (elemSeq 2 seq1)
+    putStrLn $ "Contains 5? " ++ show (elemSeq 5 seq1)
+
+    putStrLn "\n--- HC9T10 ---"
+    let bst = NodeBST 10 (NodeBST 5 EmptyBST EmptyBST) (NodeBST 15 EmptyBST EmptyBST)
+    print bst
