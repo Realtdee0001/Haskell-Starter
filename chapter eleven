@@ -1,0 +1,80 @@
+module Main where
+
+import Data.Char (toUpper)
+
+-- HC11T1: Greet the User
+hc11t1 :: IO ()
+hc11t1 = do
+    let name = "Alice"   -- example input
+    putStrLn $ "Hello, " ++ name ++ "!"
+
+-- HC11T2: Count Characters in a Line
+hc11t2 :: IO ()
+hc11t2 = do
+    let line = "Hello World"
+    putStrLn $ "Number of characters: " ++ show (length line)
+
+-- HC11T3: Double a Number
+hc11t3 :: IO ()
+hc11t3 = do
+    let n = 7
+    putStrLn $ "Double is: " ++ show (n * 2)
+
+-- HC11T4: Concatenate Two Lines
+hc11t4 :: IO ()
+hc11t4 = do
+    let l1 = "Hello "
+    let l2 = "World"
+    putStrLn $ "Concatenated: " ++ (l1 ++ l2)
+
+-- HC11T5: Repeat Until "quit"
+hc11t5 :: IO ()
+hc11t5 = do
+    let inputs = ["hi", "how are you?", "quit"]
+    mapM_ (\x -> if x == "quit"
+                 then putStrLn "Goodbye!"
+                 else putStrLn $ "You typed: " ++ x) inputs
+
+-- HC11T6: Uppercase Converter
+hc11t6 :: IO ()
+hc11t6 = do
+    let line = "hello world"
+    putStrLn $ map toUpper line
+
+-- HC11T7: User Options
+hc11t7 :: IO ()
+hc11t7 = do
+    let choice = 2  -- example choice
+    case choice of
+        1 -> putStrLn "Hello, User!"
+        2 -> do
+            let n1 = 5
+            let n2 = 7
+            putStrLn $ "Sum is: " ++ show (n1 + n2)
+        3 -> putStrLn "Exiting..."
+        _ -> putStrLn "Invalid option"
+
+-- HC11T8: Even or Odd Checker
+hc11t8 :: IO ()
+hc11t8 = do
+    let n = 42
+    if even n
+        then putStrLn "Even"
+        else putStrLn "Odd"
+
+-- HC11T9: Sum Two Numbers
+hc11t9 :: IO ()
+hc11t9 = do
+    let n1 = 12
+    let n2 = 8
+    putStrLn $ "Sum is: " ++ show (n1 + n2)
+
+-- HC11T10: Reverse User Input
+hc11t10 :: IO ()
+hc11t10 = do
+    let line = "Haskell"
+    putStrLn $ reverse line
+
+-- Choose which task to run by changing main = hc11tX
+main :: IO ()
+main = hc11t1   -- change this to hc11t2, hc11t3, ... hc11t10
