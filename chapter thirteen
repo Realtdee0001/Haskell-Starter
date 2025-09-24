@@ -1,0 +1,56 @@
+module Main where
+
+import System.Directory (listDirectory)
+import qualified Data.List as L
+import qualified Data.Map as M
+
+-- HC13T4 + HC13T5: sumNonEmpty function
+sumNonEmpty :: [Int] -> Int
+sumNonEmpty [] = error "sumNonEmpty: empty list!"
+sumNonEmpty xs = sum xs
+
+-- HC13T1: List files in current directory
+listFilesInDir :: IO [FilePath]
+listFilesInDir = listDirectory "."
+
+-- HC13T2: Filter files by substring
+filterFiles :: String -> [FilePath] -> [FilePath]
+filterFiles sub = filter (L.isInfixOf sub)
+
+-- HC13T3: Sort and return filtered files
+sortFilteredFiles :: String -> [FilePath] -> [FilePath]
+sortFilteredFiles sub = L.sort . filterFiles sub
+
+-- HC13T6: Convert list of filenames into a Map
+filesToMap :: [FilePath] -> M.Map Int FilePath
+filesToMap xs = M.fromList (zip [1..] xs)
+
+main :: IO ()
+main = do
+    putStrLn "== HC13T1: Files in current directory =="
+    allFiles <- listFilesInDir
+    print allFiles
+
+    putStrLn "\n== HC13T2 + HC13T3: Filtered & Sorted files containing 'hs' =="
+    let filteredSorted = sortFilteredFiles "hs" allFiles
+    print filteredSorted
+
+    putStrLn "\n== HC13T6: Files mapped to indices =="
+    let fileMap = filesToMap filteredSorted
+    print fileMap
+
+    putStrLn "\n== HC13T7: Using sumNonEmpty function =="
+    let nums = [1,2,3,4,5]
+    print $ sumNonEmpty nums
+
+    putStrLn "\n== HC13T8: Demonstrating qualified import (Data.Map) =="
+    print $ M.keys fileMap
+
+    putStrLn "\n== HC13T9: Demonstrating renamed import (Data.List as L) =="
+    print $ L.intercalate ", " filteredSorted
+
+    putStrLn "\n== HC13T10: Multi-module usage (System.Directory + Data.List) =="
+    dirs <- listDirectory "."
+    let sortedDirs = L.sort dirs
+    putStrLn "Sorted directory entries:"
+    print sortedDirs
