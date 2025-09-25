@@ -1,0 +1,54 @@
+{-# LANGUAGE NumericUnderscores #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE PartialTypeSignatures #-}
+
+module Main where
+
+import Data.List (group, sort)
+
+-- HC14T3: NumericUnderscores Extension
+bigNumber1 :: Integer
+bigNumber1 = 1_000_000
+
+bigNumber2 :: Integer
+bigNumber2 = 2_500_000_000
+
+-- HC14T4: TypeApplications Extension
+readInt :: String -> Int
+readInt = read @Int
+
+-- HC14T5: Custom Data Type and Pattern Matching with @
+data Result a = Success a | Failure String deriving Show
+
+describeResult :: Result Int -> String
+describeResult r@(Success n) = "Got a success value " ++ show n ++ " from " ++ show r
+describeResult r@(Failure msg) = "Got a failure: " ++ msg ++ " from " ++ show r
+
+-- HC14T8: Character Frequency Function
+counts :: String -> [(Char, Int)]
+counts str = map (\xs -> (head xs, length xs)) . group . sort $ str
+
+-- HC14T9: PartialTypeSignatures Extension
+-- Wildcard in the type: compiler fills in details
+sumList :: _ -> Int
+sumList = sum
+
+-- Main to run everything
+main :: IO ()
+main = do
+  putStrLn "== HC14T3: NumericUnderscores =="
+  print bigNumber1
+  print bigNumber2
+
+  putStrLn "\n== HC14T4: TypeApplications =="
+  print (readInt "1234")
+
+  putStrLn "\n== HC14T5: Result and Pattern Matching with @ =="
+  putStrLn (describeResult (Success 42))
+  putStrLn (describeResult (Failure "Something went wrong"))
+
+  putStrLn "\n== HC14T8: Character Frequency Function =="
+  print (counts "haskellhaskell")
+
+  putStrLn "\n== HC14T9: PartialTypeSignatures =="
+  print (sumList [1,2,3,4,5])
