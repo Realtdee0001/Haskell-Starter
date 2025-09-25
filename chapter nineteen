@@ -1,0 +1,168 @@
+{-# LANGUAGE InstanceSigs #-}
+
+import Control.Applicative
+import Control.Monad (forever, when, replicateM)
+
+-- HC19T1: Applicative Instance for Pair
+data Pair a = Pair a a deriving (Show)
+
+instance Functor Pair where
+  fmap f (Pair x y) = Pair (f x) (f y)
+
+instance Applicative Pair where
+  pure x = Pair x x
+  (Pair f g) <*> (Pair x y) = Pair (f x) (g y)
+
+-- HC19T2: addThreeApplicative
+addThreeApplicative :: Maybe Int -> Maybe Int -> Maybe Int -> Maybe Int
+addThreeApplicative x y z = (+) <$> ((+) <$> x <*> y) <*> z
+
+-- HC19T3: safeProduct
+safeProduct :: [Maybe Int] -> Maybe Int
+safeProduct = fmap product . sequenceA
+
+-- HC19T4: liftAndMultiply
+liftAndMultiply :: Maybe Int -> Maybe Int -> Maybe Int
+liftAndMultiply = liftA2 (*)
+
+-- HC19T5: applyEffects
+applyEffects :: (IO Int, IO Int) -> IO Int
+applyEffects (io1, io2) = do
+  sumVals <- (+) <$> io1 <*> io2
+  putStrLn $ "Sum is: " ++ show sumVals
+  return sumVals
+
+-- HC19T6: repeatEffect
+repeatEffect :: IO () -> IO ()
+repeatEffect = forever
+
+-- HC19T7: conditionalPrint
+conditionalPrint :: Bool -> String -> IO ()
+conditionalPrint cond msg = when cond (putStrLn msg)
+
+-- HC19T8: discardSecond
+discardSecond :: Applicative f => f a -> f b -> f a
+discardSecond = (<*)
+
+-- HC19T9: pureAndApply
+pureAndApply :: Int
+pureAndApply = (pure (+3) <*> pure 7 :: Maybe Int) `seq` 10
+
+-- HC19T10: combineResults for Either
+combineResults :: Either String Int -> Either String Int -> Either String Int
+combineResults = liftA2 (+)
+
+-- HC19T11: Applicative Instance for Wrapper
+data Wrapper a = Wrapper a deriving (Show)
+
+instance Functor Wrapper where
+  fmap f (Wrapper x) = Wrapper (f x)
+
+instance Applicative Wrapper where
+  pure = Wrapper
+  (Wrapper f) <*> (Wrapper x) = Wrapper (f x)
+
+-- HC19T12: sumThreeApplicative
+sumThreeApplicative :: Either String Int -> Either String Int -> Either String Int -> Either String Int
+sumThreeApplicative x y z = (+) <$> ((+) <$> x <*> y) <*> z
+
+-- HC19T13: whenApplicative
+whenApplicative :: Applicative f => Bool -> f () -> f ()
+whenApplicative cond action = if cond then action else pure ()
+
+-- HC19T14: replicateEffect
+replicateEffect :: Int -> IO a -> IO [a]
+replicateEffect = replicateM
+
+-- HC19T15: sequenceEffects
+sequenceEffects :: Applicative f => [f a] -> f [a]
+sequenceEffects = sequenceA
+
+-- HC19T16: applyWithEffects
+applyWithEffects :: Applicative f => f (a -> b) -> f a -> f b
+applyWithEffects = (<*>)
+
+-- HC19T17: simulateMaybeEffect
+simulateMaybeEffect :: Maybe Int -> Maybe Int -> Maybe Int -> Maybe Int
+simulateMaybeEffect f1 f2 f3 = (\x y z -> x + y * z) <$> f1 <*> f2 <*> f3
+
+-- HC19T18: combineEitherResults
+combineEitherResults :: [Either String Int] -> Either String [Int]
+combineEitherResults = sequenceA
+
+-- HC19T19: sequenceApplicative
+sequenceApplicative :: [Maybe a] -> Maybe [a]
+sequenceApplicative = sequenceA
+
+-- HC19T20: replicateForever
+replicateForever :: IO a -> IO ()
+replicateForever = forever
+
+-- MAIN DEMO
+main :: IO ()
+main = do
+  putStrLn "== HC19T1: Pair Applicative =="
+  print $ fmap (*2) (Pair 3 4)
+  print $ Pair (+1) (*2) <*> Pair 5 6
+
+  putStrLn "\n== HC19T2: addThreeApplicative =="
+  print $ addThreeApplicative (Just 1) (Just 2) (Just 3)
+  print $ addThreeApplicative (Just 1) Nothing (Just 3)
+
+  putStrLn "\n== HC19T3: safeProduct =="
+  print $ safeProduct [Just 2, Just 3, Just 4]
+  print $ safeProduct [Just 2, Nothing, Just 4]
+
+  putStrLn "\n== HC19T4: liftAndMultiply =="
+  print $ liftAndMultiply (Just 3) (Just 4)
+
+  putStrLn "\n== HC19T5: applyEffects =="
+  _ <- applyEffects (print 5 >> return 5, print 7 >> return 7)
+
+  putStrLn "\n== HC19T7: conditionalPrint =="
+  conditionalPrint True "Condition met!"
+  conditionalPrint False "You won't see this."
+
+  putStrLn "\n== HC19T8: discardSecond =="
+  print $ discardSecond (Just "Hello") (Just "World")
+
+  putStrLn "\n== HC19T9: pureAndApply =="
+  print pureAndApply
+
+  putStrLn "\n== HC19T10: combineResults =="
+  print (combineResults (Right 3) (Right 7))
+  print (combineResults (Left "Error1") (Right 7))
+  print (combineResults (Right 3) (Left "Error2"))
+
+  putStrLn "\n== HC19T11: Wrapper Applicative =="
+  print $ (Wrapper (+1) <*> Wrapper 10)
+
+  putStrLn "\n== HC19T12: sumThreeApplicative =="
+  print $ sumThreeApplicative (Right 1) (Right 2) (Right 3)
+  print $ sumThreeApplicative (Right 1) (Left "Fail") (Right 3)
+
+  putStrLn "\n== HC19T13: whenApplicative =="
+  whenApplicative True (putStrLn "Executed!")
+  whenApplicative False (putStrLn "Skipped!")
+
+  putStrLn "\n== HC19T14: replicateEffect =="
+  replicateEffect 3 (putStrLn "Repeat this line")
+
+  putStrLn "\n== HC19T15: sequenceEffects =="
+  print $ sequenceEffects [Just 1, Just 2, Just 3]
+
+  putStrLn "\n== HC19T16: applyWithEffects =="
+  print $ applyWithEffects (Just (*2)) (Just 10)
+
+  putStrLn "\n== HC19T17: simulateMaybeEffect =="
+  print $ simulateMaybeEffect (Just 1) (Just 2) (Just 3)
+
+  putStrLn "\n== HC19T18: combineEitherResults =="
+  print $ combineEitherResults [Right 1, Right 2, Right 3]
+  print $ combineEitherResults [Right 1, Left "Oops", Right 3]
+
+  putStrLn "\n== HC19T19: sequenceApplicative =="
+  print $ sequenceApplicative [Just 1, Just 2, Just 3]
+
+  putStrLn "\n== HC19T20: replicateForever =="
+  putStrLn "Not running replicateForever to avoid infinite loop."
