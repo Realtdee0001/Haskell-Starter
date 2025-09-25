@@ -1,0 +1,101 @@
+{-# LANGUAGE FlexibleContexts #-}
+
+import Control.Monad
+import Control.Monad.Writer
+import Control.Monad.State
+import Control.Monad.Reader
+import Control.Monad.Trans.Maybe
+import Data.Maybe
+
+-- HC20T1: safeDivide with Maybe Monad
+safeDivide :: Double -> Double -> Maybe Double
+safeDivide _ 0 = Nothing
+safeDivide x y = Just (x / y)
+
+-- HC20T2: sequenceMaybe for list of Maybe
+sequenceMaybe :: [Maybe a] -> Maybe [a]
+sequenceMaybe = sequence
+
+-- HC20T3: Writer Monad Logging Calculator
+addLogged :: Int -> Int -> Writer [String] Int
+addLogged x y = writer (x + y, ["Adding " ++ show x ++ " and " ++ show y])
+
+-- HC20T4: countChars with State Monad
+countChars :: Char -> String -> Int
+countChars c s = execState (mapM_ step s) 0
+  where
+    step x = when (x == c) $ modify (+1)
+
+-- HC20T5: Reader Monad for Configurable Greeting
+type Config = String
+greet :: Reader Config String
+greet = do
+  name <- ask
+  return $ "Hello, " ++ name ++ "!"
+
+-- HC20T6: doubleMonad Combining Maybe and List
+doubleMonad :: Maybe [a] -> [Maybe a]
+doubleMonad Nothing  = []
+doubleMonad (Just xs) = map Just xs
+
+-- HC20T7: findFirst with Either Monad
+findFirst :: (a -> Bool) -> [a] -> Either String a
+findFirst _ [] = Left "No element found"
+findFirst p (x:xs) = if p x then Right x else findFirst p xs
+
+-- HC20T8: Parser Monad for simple expressions (just parses integers)
+parseNumber :: String -> Maybe Int
+parseNumber s = case reads s of
+  [(n,"")] -> Just n
+  _        -> Nothing
+
+-- HC20T9: replicateMonad with Identity Monad
+newtype Identity a = Identity { runIdentity :: a } deriving (Show)
+replicateMonad :: Int -> a -> [a]
+replicateMonad n x = replicate n x
+
+-- HC20T10: Nested StateT and MaybeT Monad Transformer
+type MyState a = MaybeT (State Int) a
+incrementState :: MyState Int
+incrementState = do
+  n <- lift get
+  lift $ put (n+1)
+  return n
+
+-- Main function demonstrating HC20T1–HC20T10
+main :: IO ()
+main = do
+  putStrLn "== HC20T1: safeDivide =="
+  print $ safeDivide 10 2
+  print $ safeDivide 10 0
+
+  putStrLn "\n== HC20T2: sequenceMaybe =="
+  print $ sequenceMaybe [Just 1, Just 2, Just 3]
+  print $ sequenceMaybe [Just 1, Nothing, Just 3]
+
+  putStrLn "\n== HC20T3: Writer Monad =="
+  print $ runWriter (addLogged 3 4)
+
+  putStrLn "\n== HC20T4: countChars =="
+  print $ countChars 'l' "hello world"
+
+  putStrLn "\n== HC20T5: Reader Monad =="
+  print $ runReader greet "Alice"
+
+  putStrLn "\n== HC20T6: doubleMonad =="
+  print (doubleMonad (Just [1,2,3]) :: [Maybe Int])
+  print (doubleMonad Nothing :: [Maybe Int])
+
+  putStrLn "\n== HC20T7: findFirst =="
+  print $ findFirst even [1,3,5]
+  print $ findFirst even [1,2,3]
+
+  putStrLn "\n== HC20T8: parseNumber =="
+  print $ parseNumber "123"
+  print $ parseNumber "abc"
+
+  putStrLn "\n== HC20T9: replicateMonad =="
+  print $ replicateMonad 3 "hi"
+
+  putStrLn "\n== HC20T10: Nested StateT and MaybeT =="
+  print $ runState (runMaybeT incrementState) 5
