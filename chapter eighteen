@@ -1,0 +1,110 @@
+{-# LANGUAGE InstanceSigs #-}
+
+module Main where
+
+import Data.Char (toLower)
+
+--------------------------------------------------------------------------------
+-- HC18T1: mapToLower Function with fmap
+--------------------------------------------------------------------------------
+mapToLower :: String -> String
+mapToLower = fmap toLower
+
+--------------------------------------------------------------------------------
+-- HC18T2: Functor Instance for Tree
+--------------------------------------------------------------------------------
+data Tree a = Empty | Node a (Tree a) (Tree a)
+  deriving (Show, Eq)
+
+instance Functor Tree where
+  fmap :: (a -> b) -> Tree a -> Tree b
+  fmap _ Empty = Empty
+  fmap f (Node x l r) = Node (f x) (fmap f l) (fmap f r)
+
+--------------------------------------------------------------------------------
+-- HC18T3: incrementTreeValues Function
+--------------------------------------------------------------------------------
+incrementTreeValues :: Num a => Tree a -> Tree a
+incrementTreeValues = fmap (+1)
+
+--------------------------------------------------------------------------------
+-- HC18T4: mapToBits Function
+--------------------------------------------------------------------------------
+mapToBits :: [Bool] -> [Char]
+mapToBits = fmap (\b -> if b then '1' else '0')
+
+--------------------------------------------------------------------------------
+-- HC18T5: Functor Either (already in base, so just demo usage)
+--------------------------------------------------------------------------------
+demoEitherFunctor :: IO ()
+demoEitherFunctor = do
+  print (fmap (+1) (Right 10 :: Either String Int))   -- Right 11
+  print (fmap (+1) (Left "error" :: Either String Int)) -- Left "error"
+
+--------------------------------------------------------------------------------
+-- HC18T6: applyToMaybe Function
+--------------------------------------------------------------------------------
+applyToMaybe :: (a -> b) -> Maybe a -> Maybe b
+applyToMaybe = fmap
+
+--------------------------------------------------------------------------------
+-- HC18T7: fmapTuple Function
+--------------------------------------------------------------------------------
+fmapTuple :: (b -> c) -> (a, b) -> (a, c)
+fmapTuple = fmap
+
+--------------------------------------------------------------------------------
+-- HC18T8: identityLawCheck Function
+--------------------------------------------------------------------------------
+identityLawCheck :: (Functor f, Eq (f a)) => f a -> Bool
+identityLawCheck x = fmap id x == x
+
+--------------------------------------------------------------------------------
+-- HC18T9: compositionLawCheck Function
+--------------------------------------------------------------------------------
+compositionLawCheck :: (Functor f, Eq (f c)) =>
+  (b -> c) -> (a -> b) -> f a -> Bool
+compositionLawCheck f g x = fmap (f . g) x == (fmap f . fmap g) x
+
+--------------------------------------------------------------------------------
+-- HC18T10: nestedFmap Function
+--------------------------------------------------------------------------------
+nestedFmap :: (a -> b) -> [[Maybe a]] -> [[Maybe b]]
+nestedFmap = fmap . fmap . fmap
+
+--------------------------------------------------------------------------------
+-- Demo in Main
+--------------------------------------------------------------------------------
+main :: IO ()
+main = do
+  putStrLn "== HC18T1: mapToLower =="
+  print (mapToLower "HELLO FunCtor")
+
+  putStrLn "\n== HC18T2 & HC18T3: Functor Tree & incrementTreeValues =="
+  let tree = Node 10 (Node 5 Empty Empty) (Node 7 Empty Empty)
+  print tree
+  print (incrementTreeValues tree)
+
+  putStrLn "\n== HC18T4: mapToBits =="
+  print (mapToBits [True, False, True, True, False])
+
+  putStrLn "\n== HC18T5: Functor Either Demo =="
+  demoEitherFunctor
+
+  putStrLn "\n== HC18T6: applyToMaybe =="
+  print (applyToMaybe (*2) (Just 21))
+  print (applyToMaybe (*2) Nothing)
+
+  putStrLn "\n== HC18T7: fmapTuple =="
+  print (fmapTuple length ("hi", "world"))
+
+  putStrLn "\n== HC18T8: identityLawCheck =="
+  print (identityLawCheck (Just 42))
+  print (identityLawCheck [1,2,3])
+
+  putStrLn "\n== HC18T9: compositionLawCheck =="
+  print (compositionLawCheck (*2) (+1) (Just 3))
+  print (compositionLawCheck (*2) (+1) [1,2,3])
+
+  putStrLn "\n== HC18T10: nestedFmap =="
+  print (nestedFmap (+1) [[Just 1, Nothing], [Just 5]])
