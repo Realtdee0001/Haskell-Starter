@@ -1,0 +1,142 @@
+{-# LANGUAGE DeriveGeneric #-}
+
+module Main where
+
+import Data.Semigroup hiding (Min, Max)  -- hide to avoid clashes
+import Data.Monoid
+import GHC.Generics (Generic)
+
+--------------------------------------------------------------------------------
+-- HC17T1: Severity Data Type and Semigroup Instance
+--------------------------------------------------------------------------------
+data Severity = Low | Medium | High | Critical
+  deriving (Show, Eq, Ord, Generic)
+
+-- Semigroup: higher severity overrides lower
+instance Semigroup Severity where
+  (<>) = max
+
+--------------------------------------------------------------------------------
+-- HC17T2: Min and Max Newtypes with Semigroup
+--------------------------------------------------------------------------------
+newtype MyMin a = MyMin { getMyMin :: a }
+  deriving (Show, Eq, Ord)
+
+newtype MyMax a = MyMax { getMyMax :: a }
+  deriving (Show, Eq, Ord)
+
+instance Ord a => Semigroup (MyMin a) where
+  MyMin x <> MyMin y = MyMin (min x y)
+
+instance Ord a => Semigroup (MyMax a) where
+  MyMax x <> MyMax y = MyMax (max x y)
+
+--------------------------------------------------------------------------------
+-- HC17T3: Monoid Instance for Severity
+--------------------------------------------------------------------------------
+instance Monoid Severity where
+  mempty = Low
+
+--------------------------------------------------------------------------------
+-- HC17T4: Monoid Instance for Sum Newtype
+--------------------------------------------------------------------------------
+newtype MySum = MySum { getSum' :: Int }
+  deriving (Show, Eq)
+
+instance Semigroup MySum where
+  MySum x <> MySum y = MySum (x + y)
+
+instance Monoid MySum where
+  mempty = MySum 0
+
+--------------------------------------------------------------------------------
+-- HC17T5: combineLists Function
+--------------------------------------------------------------------------------
+combineLists :: [Int] -> [Int] -> [Int]
+combineLists xs ys = xs <> ys
+
+--------------------------------------------------------------------------------
+-- HC17T6: maxSeverity Function
+--------------------------------------------------------------------------------
+maxSeverity :: [Severity] -> Severity
+maxSeverity = mconcat
+
+--------------------------------------------------------------------------------
+-- HC17T7: multiplyProducts Function
+--------------------------------------------------------------------------------
+newtype Product' = Product' { getProduct' :: Int }
+  deriving (Show, Eq)
+
+instance Semigroup Product' where
+  Product' x <> Product' y = Product' (x * y)
+
+instance Monoid Product' where
+  mempty = Product' 1
+
+multiplyProducts :: [Product'] -> Product'
+multiplyProducts = mconcat
+
+--------------------------------------------------------------------------------
+-- HC17T8: foldWithSemigroup Function
+--------------------------------------------------------------------------------
+foldWithSemigroup :: Semigroup a => [a] -> a
+foldWithSemigroup = foldr1 (<>)
+
+--------------------------------------------------------------------------------
+-- HC17T9: Config Data Type and Semigroup Instance
+--------------------------------------------------------------------------------
+data Config = Config
+  { loggingLevel :: Severity
+  , timeout      :: Int
+  , retries      :: Int
+  } deriving (Show, Eq)
+
+instance Semigroup Config where
+  c1 <> c2 = Config
+    { loggingLevel = loggingLevel c1 <> loggingLevel c2
+    , timeout      = min (timeout c1) (timeout c2)
+    , retries      = max (retries c1) (retries c2)
+    }
+
+--------------------------------------------------------------------------------
+-- HC17T10: Monoid Instance for Config
+--------------------------------------------------------------------------------
+instance Monoid Config where
+  mempty = Config { loggingLevel = Low, timeout = maxBound, retries = 0 }
+
+--------------------------------------------------------------------------------
+-- Demo in Main
+--------------------------------------------------------------------------------
+main :: IO ()
+main = do
+  putStrLn "== HC17T1: Severity Semigroup =="
+  print (Low <> High)       -- High
+  print (Medium <> Critical) -- Critical
+
+  putStrLn "\n== HC17T2: MyMin and MyMax =="
+  print (MyMin 3 <> MyMin 7)  -- MyMin 3
+  print (MyMax 3 <> MyMax 7)  -- MyMax 7
+
+  putStrLn "\n== HC17T3: Severity Monoid =="
+  print (mempty <> High)  -- High
+
+  putStrLn "\n== HC17T4: Sum Monoid =="
+  print (MySum 5 <> MySum 10 <> mempty) -- MySum 15
+
+  putStrLn "\n== HC17T5: combineLists =="
+  print (combineLists [1,2,3] [4,5,6])
+
+  putStrLn "\n== HC17T6: maxSeverity =="
+  print (maxSeverity [Low, Medium, High, Critical, Medium]) -- Critical
+
+  putStrLn "\n== HC17T7: multiplyProducts =="
+  print (multiplyProducts [Product' 2, Product' 3, Product' 4]) -- Product' 24
+
+  putStrLn "\n== HC17T8: foldWithSemigroup =="
+  print (foldWithSemigroup [MySum 1, MySum 2, MySum 3]) -- MySum 6
+
+  putStrLn "\n== HC17T9 & HC17T10: Config with Semigroup/Monoid =="
+  let cfg1 = Config { loggingLevel = Medium, timeout = 30, retries = 2 }
+  let cfg2 = Config { loggingLevel = High, timeout = 60, retries = 5 }
+  print (cfg1 <> cfg2)
+  print (mempty <> cfg1)
