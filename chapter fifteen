@@ -1,0 +1,151 @@
+{-# LANGUAGE DeriveDataTypeable #-}
+
+module Main where
+
+import Control.Exception
+import Data.Typeable
+import Text.Read (readMaybe)
+import System.IO.Error (isDoesNotExistError)
+import Control.Exception (try, SomeException)
+import Data.List (intercalate)
+
+--------------------------------------------------------------------------------
+-- HC15T1: Handle Exceptions for File Reading and Velocity Calculation
+--------------------------------------------------------------------------------
+safeReadFile :: FilePath -> IO ()
+safeReadFile path = do
+  result <- try (readFile path) :: IO (Either IOError String)
+  case result of
+    Left e  -> putStrLn $ "Error reading file: " ++ show e
+    Right c -> putStrLn $ "File contents:\n" ++ c
+
+calcVelocity :: Double -> Double -> Either String Double
+calcVelocity dist time
+  | time == 0 = Left "Division by zero: time cannot be zero!"
+  | otherwise = Right (dist / time)
+
+--------------------------------------------------------------------------------
+-- HC15T2: Self-Driving AI Car System
+--------------------------------------------------------------------------------
+data TrafficLight = Red | Yellow | Green deriving (Show, Read, Eq)
+
+selfDrivingCar :: TrafficLight -> String
+selfDrivingCar Red    = "Stop"
+selfDrivingCar Yellow = "Slow down"
+selfDrivingCar Green  = "Go"
+
+--------------------------------------------------------------------------------
+-- HC15T3: Custom Exception for Traffic Light Errors
+--------------------------------------------------------------------------------
+data TrafficLightException = InvalidLight String
+  deriving (Show, Typeable)
+
+instance Exception TrafficLightException
+
+checkLight :: String -> IO TrafficLight
+checkLight str = case readMaybe str of
+  Just l  -> return l
+  Nothing -> throwIO (InvalidLight ("Invalid traffic light: " ++ str))
+
+--------------------------------------------------------------------------------
+-- HC15T4: Exception Handler for Traffic Light
+--------------------------------------------------------------------------------
+demoHandleLight :: IO ()
+demoHandleLight = do
+  let samples = ["Green", "Blue"]
+  mapM_ runSample samples
+  where
+    runSample s = (checkLight s >>= print) `catch` handler
+    handler :: TrafficLightException -> IO ()
+    handler e = putStrLn $ "Caught exception: " ++ show e
+
+--------------------------------------------------------------------------------
+-- HC15T5: Safe Division Using Maybe
+--------------------------------------------------------------------------------
+safeDiv :: Double -> Double -> Maybe Double
+safeDiv _ 0 = Nothing
+safeDiv x y = Just (x / y)
+
+--------------------------------------------------------------------------------
+-- HC15T6: Safe Input Parsing with readMaybe
+--------------------------------------------------------------------------------
+safeParse :: String -> Maybe Int
+safeParse = readMaybe
+
+--------------------------------------------------------------------------------
+-- HC15T7: Velocity Calculation with Optionals and Parsing Handling
+--------------------------------------------------------------------------------
+velocityDemo :: String -> String -> IO ()
+velocityDemo distStr timeStr =
+  case (readMaybe distStr, readMaybe timeStr) of
+    (Just d, Just t) ->
+      case calcVelocity d t of
+        Left err -> putStrLn err
+        Right v  -> putStrLn $ "Velocity = " ++ show v
+    _ -> putStrLn "Invalid input!"
+
+--------------------------------------------------------------------------------
+-- HC15T8: Division with Either for Detailed Errors
+--------------------------------------------------------------------------------
+divEither :: Double -> Double -> Either String Double
+divEither _ 0 = Left "Error: division by zero"
+divEither x y = Right (x / y)
+
+--------------------------------------------------------------------------------
+-- HC15T9: Try Function for File IO Exceptions
+--------------------------------------------------------------------------------
+tryRead :: FilePath -> IO ()
+tryRead path = do
+  result <- try (readFile path) :: IO (Either SomeException String)
+  case result of
+    Left e  -> putStrLn $ "Caught exception: " ++ show e
+    Right c -> putStrLn $ "File contents:\n" ++ c
+
+--------------------------------------------------------------------------------
+-- HC15T10: Hybrid Error Handling with Either and IO
+--------------------------------------------------------------------------------
+velocityHybrid :: Double -> Double -> IO ()
+velocityHybrid dist time =
+  case divEither dist time of
+    Left err -> putStrLn ("Calculation error: " ++ err)
+    Right v  -> putStrLn ("Velocity: " ++ show v)
+
+--------------------------------------------------------------------------------
+-- Main Program Demo (Non-interactive)
+--------------------------------------------------------------------------------
+main :: IO ()
+main = do
+  putStrLn "== HC15T1: File Read and Velocity =="
+  safeReadFile "nonexistent.txt"
+  print (calcVelocity 100 0)
+  print (calcVelocity 100 10)
+
+  putStrLn "\n== HC15T2: Self-Driving AI Car System =="
+  mapM_ (print . selfDrivingCar) [Red, Yellow, Green]
+
+  putStrLn "\n== HC15T3 & HC15T4: Traffic Light with Custom Exception =="
+  demoHandleLight
+
+  putStrLn "\n== HC15T5: Safe Division with Maybe =="
+  print (safeDiv 10 2)
+  print (safeDiv 10 0)
+
+  putStrLn "\n== HC15T6: Safe Input Parsing =="
+  print (safeParse "123")
+  print (safeParse "oops")
+
+  putStrLn "\n== HC15T7: Velocity Program with Optional Parsing =="
+  velocityDemo "100" "20"
+  velocityDemo "100" "0"
+  velocityDemo "abc" "5"
+
+  putStrLn "\n== HC15T8: Division with Either =="
+  print (divEither 10 2)
+  print (divEither 10 0)
+
+  putStrLn "\n== HC15T9: Try for File IO Exceptions =="
+  tryRead "maybe.txt"
+
+  putStrLn "\n== HC15T10: Hybrid Error Handling with Either and IO =="
+  velocityHybrid 50 0
+  velocityHybrid 50 5
